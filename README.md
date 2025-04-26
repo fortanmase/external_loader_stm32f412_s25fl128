@@ -1,0 +1,1 @@
+# external_loader_stm32f412_s25fl128
