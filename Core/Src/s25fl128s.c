@@ -556,6 +556,85 @@ int32_t S25FL128S_ChipErase(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode)
     return S25FL128S_OK;
 }
 
+int32_t S25FL128S_DummyCyclesCfg(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t mode)
+{
+    QSPI_CommandTypeDef s_command;
+    uint8_t reg[2];
+    /* Command ID differs between N25Q512A and S25FL512S memories */
+    /* Initialize the read configuration register command */
+    s_command.InstructionMode = QSPI_INSTRUCTION_1_LINE;
+    s_command.Instruction = S25FL128S_READ_CONFIGURATION_REG1_CMD;
+    s_command.AddressMode = QSPI_ADDRESS_NONE;
+    s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
+    s_command.DataMode = QSPI_DATA_1_LINE;
+    s_command.DummyCycles = 0;
+    s_command.NbData = 1;
+    s_command.DdrMode = QSPI_DDR_MODE_DISABLE;
+    s_command.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;
+    s_command.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;
+
+    /* Configure the command */
+    if (HAL_QSPI_Command(Ctx, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+    {
+        return S25FL128S_ERROR;
+    }
+
+    /* Reception of the data */
+    if (HAL_QSPI_Receive(Ctx, &reg[1], HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+    {
+        return S25FL128S_ERROR;
+    }
+
+    /* Initialize the read status register1 command */
+    s_command.InstructionMode = QSPI_INSTRUCTION_1_LINE;
+    s_command.Instruction = S25FL128S_READ_STATUS_REG1_CMD;
+    s_command.AddressMode = QSPI_ADDRESS_NONE;
+    s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
+    s_command.DataMode = QSPI_DATA_1_LINE;
+    s_command.DummyCycles = 0;
+    s_command.NbData = 1;
+    s_command.DdrMode = QSPI_DDR_MODE_DISABLE;
+    s_command.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;
+    s_command.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;
+
+    /* Configure the command */
+    if (HAL_QSPI_Command(Ctx, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+    {
+        return S25FL128S_ERROR;
+    }
+
+    /* Reception of the data */
+    if (HAL_QSPI_Receive(Ctx, &reg[0], HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+    {
+        return S25FL128S_ERROR;
+    }
+
+    /* Enable write operations */
+    if (S25FL128S_WriteEnable(Ctx, mode) != S25FL128S_OK)
+    {
+        return S25FL128S_ERROR;
+    }
+
+    /* Update configuration register (with new Latency Code) */
+    s_command.Instruction = S25FL128S_WRITE_STATUS_CMD_REG_CMD;
+    s_command.NbData = 2;
+    MODIFY_REG(reg[1], S25FL128S_CR1_LC_MASK, S25FL128S_CR1_LC1);
+
+    /* Configure the write volatile configuration register command */
+    if (HAL_QSPI_Command(Ctx, &s_command, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+    {
+        return S25FL128S_ERROR;
+    }
+
+    /* Transmission of the data Status Register 1 */
+    if (HAL_QSPI_Transmit(Ctx, reg, HAL_QPSI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+    {
+        return S25FL128S_ERROR;
+    }
+
+    return S25FL128S_OK;
+}
+
 /**
  * @brief  Reads an amount of data from the QSPI memory on STR mode.
  *         SPI/DPI/QPI; 1-1-1/1-1-2/1-2-2/1-1-4/1-4-4
@@ -885,17 +964,114 @@ int32_t S25FL128S_ReadSFDP(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, 
 }
 
 /**
- * @}
+ * @brief  Reads Configuration Register 1
+ * @param  Ctx QSPI handle
+ * @param  Mode Flash mode
+ * @param  Value Pointer to store the read configuration register value
+ * @retval S25FL128S_OK or S25FL128S_ERROR
  */
+int32_t S25FL128S_ReadConfigurationRegister1(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *Value)
+{
+    QSPI_CommandTypeDef s_command;
 
-/**
- * @}
- */
+    UNUSED(Mode); /* The command Read Configuration Register 1 is always 1-0-1 */
 
-/**
- * @}
- */
+    /* Initialize the reading of configuration register 1 */
+    s_command.InstructionMode = QSPI_INSTRUCTION_1_LINE;
+    s_command.Instruction = S25FL128S_READ_CONFIGURATION_REG1_CMD;
+    s_command.AddressMode = QSPI_ADDRESS_NONE;
+    s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
+    s_command.DataMode = QSPI_DATA_1_LINE;
+    s_command.DummyCycles = 0;
+    s_command.NbData = 1;
+    s_command.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;
+    s_command.DdrMode = QSPI_DDR_MODE_DISABLE;
+    s_command.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;
 
-/**
- * @}
- */
+    /* Configure the command */
+    if (HAL_QSPI_Command(Ctx, &s_command, HAL_QSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+    {
+        return S25FL128S_ERROR;
+    }
+
+    /* Reception of the data */
+    if (HAL_QSPI_Receive(Ctx, Value, HAL_QSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+    {
+        return S25FL128S_ERROR;
+    }
+
+    return S25FL128S_OK;
+}
+
+int32_t S25FL128S_WriteRegisters(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *RegValues, uint8_t NumRegs, bool Volatile)
+{
+    QSPI_CommandTypeDef s_command;
+    int32_t ret;
+
+    /* Validate parameters */
+    if (RegValues == NULL || NumRegs < 1 || NumRegs > 4)
+    {
+        return S25FL128S_ERROR;
+    }
+
+    /* Enable writes - either volatile or non-volatile */
+    if (Volatile)
+    {
+        /* Write Enable for Volatile Registers command */
+        s_command.InstructionMode = QSPI_INSTRUCTION_1_LINE;
+        s_command.Instruction = S25FL128S_WRITE_ENABLE_VOLATILE_REG_CMD;
+        s_command.AddressMode = QSPI_ADDRESS_NONE;
+        s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
+        s_command.DataMode = QSPI_DATA_NONE;
+        s_command.DummyCycles = 0;
+        s_command.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;
+        s_command.DdrMode = QSPI_DDR_MODE_DISABLE;
+        s_command.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;
+
+        if (HAL_QSPI_Command(Ctx, &s_command, HAL_QSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+        {
+            return S25FL128S_ERROR;
+        }
+    }
+    else
+    {
+        /* Use standard Write Enable command for non-volatile writes */
+        ret = S25FL128S_WriteEnable(Ctx, Mode);
+        if (ret != S25FL128S_OK)
+        {
+            return ret;
+        }
+    }
+
+    /* Write Registers command */
+    s_command.InstructionMode = QSPI_INSTRUCTION_1_LINE;
+    s_command.Instruction = S25FL128S_WRITE_STATUS_CMD_REG_CMD;
+    s_command.AddressMode = QSPI_ADDRESS_NONE;
+    s_command.AlternateByteMode = QSPI_ALTERNATE_BYTES_NONE;
+    s_command.DataMode = QSPI_DATA_1_LINE;
+    s_command.DummyCycles = 0;
+    s_command.NbData = NumRegs; /* Number of registers to write */
+    s_command.DdrHoldHalfCycle = QSPI_DDR_HHC_ANALOG_DELAY;
+    s_command.DdrMode = QSPI_DDR_MODE_DISABLE;
+    s_command.SIOOMode = QSPI_SIOO_INST_EVERY_CMD;
+
+    /* Configure the command */
+    if (HAL_QSPI_Command(Ctx, &s_command, HAL_QSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+    {
+        return S25FL128S_ERROR;
+    }
+
+    /* Transmit register values */
+    if (HAL_QSPI_Transmit(Ctx, RegValues, HAL_QSPI_TIMEOUT_DEFAULT_VALUE) != HAL_OK)
+    {
+        return S25FL128S_ERROR;
+    }
+
+    /* Wait for write operation to complete */
+    if (!Volatile)
+    {
+        return S25FL128S_AutoPollingMemReady(Ctx, Mode);
+    }
+
+    return S25FL128S_OK;
+}

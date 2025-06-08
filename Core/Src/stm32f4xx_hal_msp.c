@@ -1,21 +1,21 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file         stm32f4xx_hal_msp.c
-  * @brief        This file provides code for the MSP Initialization
-  *               and de-Initialization codes.
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2025 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file         stm32f4xx_hal_msp.c
+ * @brief        This file provides code for the MSP Initialization
+ *               and de-Initialization codes.
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2025 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 
 /* Includes ------------------------------------------------------------------*/
@@ -59,8 +59,8 @@
 
 /* USER CODE END 0 */
 /**
-  * Initializes the Global MSP.
-  */
+ * Initializes the Global MSP.
+ */
 void HAL_MspInit(void)
 {
   /* USER CODE BEGIN MspInit 0 */
@@ -78,168 +78,164 @@ void HAL_MspInit(void)
 }
 
 /**
-* @brief QSPI MSP Initialization
-* This function configures the hardware resources used in this example
-* @param hqspi: QSPI handle pointer
-* @retval None
-*/
-void HAL_QSPI_MspInit(QSPI_HandleTypeDef* hqspi)
+ * @brief QSPI MSP Initialization
+ * This function configures the hardware resources used in this example
+ * @param hqspi: QSPI handle pointer
+ * @retval None
+ */
+void HAL_QSPI_MspInit(QSPI_HandleTypeDef *hqspi)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(hqspi->Instance==QUADSPI)
+  if (hqspi->Instance == QUADSPI)
   {
-  /* USER CODE BEGIN QUADSPI_MspInit 0 */
+    /* USER CODE BEGIN QUADSPI_MspInit 0 */
 
-  /* USER CODE END QUADSPI_MspInit 0 */
+    /* USER CODE END QUADSPI_MspInit 0 */
     /* Peripheral clock enable */
     __HAL_RCC_QSPI_CLK_ENABLE();
 
-    __HAL_RCC_GPIOE_CLK_ENABLE();
+    __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
-    __HAL_RCC_GPIOD_CLK_ENABLE();
+    __HAL_RCC_GPIOC_CLK_ENABLE();
     /**QUADSPI GPIO Configuration
-    PE2     ------> QUADSPI_BK1_IO2
-    PB2     ------> QUADSPI_CLK
-    PD11     ------> QUADSPI_BK1_IO0
-    PD12     ------> QUADSPI_BK1_IO1
-    PD13     ------> QUADSPI_BK1_IO3
+    PA1     ------> QUADSPI_BK1_IO3
+    PB1     ------> QUADSPI_CLK
+    PC8     ------> QUADSPI_BK1_IO2
+    PC9     ------> QUADSPI_BK1_IO0
+    PC10     ------> QUADSPI_BK1_IO1
     PB6     ------> QUADSPI_BK1_NCS
     */
-    GPIO_InitStruct.Pin = GPIO_PIN_2;
+    GPIO_InitStruct.Pin = FLASH_BK1_IO3_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF9_QSPI;
-    HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+    HAL_GPIO_Init(FLASH_BK1_IO3_GPIO_Port, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_2;
+    GPIO_InitStruct.Pin = FLASH_CLK_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF9_QSPI;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    HAL_GPIO_Init(FLASH_CLK_GPIO_Port, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_11|GPIO_PIN_12|GPIO_PIN_13;
+    GPIO_InitStruct.Pin = FLASH_BK1_IO2_Pin | FLASH_BK1_IO0_Pin | FLASH_BK1_IO1_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF9_QSPI;
-    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+    HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
-    GPIO_InitStruct.Pin = GPIO_PIN_6;
+    GPIO_InitStruct.Pin = FLASH_BK1_NCS_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     GPIO_InitStruct.Alternate = GPIO_AF10_OTG_FS;
-    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+    HAL_GPIO_Init(FLASH_BK1_NCS_GPIO_Port, &GPIO_InitStruct);
 
-  /* USER CODE BEGIN QUADSPI_MspInit 1 */
+    /* USER CODE BEGIN QUADSPI_MspInit 1 */
 
-  /* USER CODE END QUADSPI_MspInit 1 */
+    /* USER CODE END QUADSPI_MspInit 1 */
   }
-
 }
 
 /**
-* @brief QSPI MSP De-Initialization
-* This function freeze the hardware resources used in this example
-* @param hqspi: QSPI handle pointer
-* @retval None
-*/
-void HAL_QSPI_MspDeInit(QSPI_HandleTypeDef* hqspi)
+ * @brief QSPI MSP De-Initialization
+ * This function freeze the hardware resources used in this example
+ * @param hqspi: QSPI handle pointer
+ * @retval None
+ */
+void HAL_QSPI_MspDeInit(QSPI_HandleTypeDef *hqspi)
 {
-  if(hqspi->Instance==QUADSPI)
+  if (hqspi->Instance == QUADSPI)
   {
-  /* USER CODE BEGIN QUADSPI_MspDeInit 0 */
+    /* USER CODE BEGIN QUADSPI_MspDeInit 0 */
 
-  /* USER CODE END QUADSPI_MspDeInit 0 */
+    /* USER CODE END QUADSPI_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_QSPI_CLK_DISABLE();
 
     /**QUADSPI GPIO Configuration
-    PE2     ------> QUADSPI_BK1_IO2
-    PB2     ------> QUADSPI_CLK
-    PD11     ------> QUADSPI_BK1_IO0
-    PD12     ------> QUADSPI_BK1_IO1
-    PD13     ------> QUADSPI_BK1_IO3
+    PA1     ------> QUADSPI_BK1_IO3
+    PB1     ------> QUADSPI_CLK
+    PC8     ------> QUADSPI_BK1_IO2
+    PC9     ------> QUADSPI_BK1_IO0
+    PC10     ------> QUADSPI_BK1_IO1
     PB6     ------> QUADSPI_BK1_NCS
     */
-    HAL_GPIO_DeInit(GPIOE, GPIO_PIN_2);
+    HAL_GPIO_DeInit(FLASH_BK1_IO3_GPIO_Port, FLASH_BK1_IO3_Pin);
 
-    HAL_GPIO_DeInit(GPIOB, GPIO_PIN_2|GPIO_PIN_6);
+    HAL_GPIO_DeInit(GPIOB, FLASH_CLK_Pin | FLASH_BK1_NCS_Pin);
 
-    HAL_GPIO_DeInit(GPIOD, GPIO_PIN_11|GPIO_PIN_12|GPIO_PIN_13);
+    HAL_GPIO_DeInit(GPIOC, FLASH_BK1_IO2_Pin | FLASH_BK1_IO0_Pin | FLASH_BK1_IO1_Pin);
 
-  /* USER CODE BEGIN QUADSPI_MspDeInit 1 */
+    /* USER CODE BEGIN QUADSPI_MspDeInit 1 */
 
-  /* USER CODE END QUADSPI_MspDeInit 1 */
+    /* USER CODE END QUADSPI_MspDeInit 1 */
   }
-
 }
 
 /**
-* @brief UART MSP Initialization
-* This function configures the hardware resources used in this example
-* @param huart: UART handle pointer
-* @retval None
-*/
-void HAL_UART_MspInit(UART_HandleTypeDef* huart)
+ * @brief UART MSP Initialization
+ * This function configures the hardware resources used in this example
+ * @param huart: UART handle pointer
+ * @retval None
+ */
+void HAL_UART_MspInit(UART_HandleTypeDef *huart)
 {
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-  if(huart->Instance==USART3)
-  {
-  /* USER CODE BEGIN USART3_MspInit 0 */
+  // GPIO_InitTypeDef GPIO_InitStruct = {0};
+  // if (huart->Instance == USART3)
+  // {
+  //   /* USER CODE BEGIN USART3_MspInit 0 */
 
-  /* USER CODE END USART3_MspInit 0 */
-    /* Peripheral clock enable */
-    __HAL_RCC_USART3_CLK_ENABLE();
+  //   /* USER CODE END USART3_MspInit 0 */
+  //   /* Peripheral clock enable */
+  //   __HAL_RCC_USART3_CLK_ENABLE();
 
-    __HAL_RCC_GPIOD_CLK_ENABLE();
-    /**USART3 GPIO Configuration
-    PD8     ------> USART3_TX
-    PD9     ------> USART3_RX
-    */
-    GPIO_InitStruct.Pin = STLK_RX_Pin|STLK_TX_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-    GPIO_InitStruct.Alternate = GPIO_AF7_USART3;
-    HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
+  //   __HAL_RCC_GPIOD_CLK_ENABLE();
+  //   /**USART3 GPIO Configuration
+  //   PD8     ------> USART3_TX
+  //   PD9     ------> USART3_RX
+  //   */
+  //   GPIO_InitStruct.Pin = STLK_RX_Pin | STLK_TX_Pin;
+  //   GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  //   GPIO_InitStruct.Pull = GPIO_NOPULL;
+  //   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
+  //   GPIO_InitStruct.Alternate = GPIO_AF7_USART3;
+  //   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /* USER CODE BEGIN USART3_MspInit 1 */
+  //   /* USER CODE BEGIN USART3_MspInit 1 */
 
-  /* USER CODE END USART3_MspInit 1 */
-  }
-
+  //   /* USER CODE END USART3_MspInit 1 */
+  // }
 }
 
 /**
-* @brief UART MSP De-Initialization
-* This function freeze the hardware resources used in this example
-* @param huart: UART handle pointer
-* @retval None
-*/
-void HAL_UART_MspDeInit(UART_HandleTypeDef* huart)
+ * @brief UART MSP De-Initialization
+ * This function freeze the hardware resources used in this example
+ * @param huart: UART handle pointer
+ * @retval None
+ */
+void HAL_UART_MspDeInit(UART_HandleTypeDef *huart)
 {
-  if(huart->Instance==USART3)
-  {
-  /* USER CODE BEGIN USART3_MspDeInit 0 */
+  // if (huart->Instance == USART3)
+  // {
+  //   /* USER CODE BEGIN USART3_MspDeInit 0 */
 
-  /* USER CODE END USART3_MspDeInit 0 */
-    /* Peripheral clock disable */
-    __HAL_RCC_USART3_CLK_DISABLE();
+  //   /* USER CODE END USART3_MspDeInit 0 */
+  //   /* Peripheral clock disable */
+  //   __HAL_RCC_USART3_CLK_DISABLE();
 
-    /**USART3 GPIO Configuration
-    PD8     ------> USART3_TX
-    PD9     ------> USART3_RX
-    */
-    HAL_GPIO_DeInit(GPIOD, STLK_RX_Pin|STLK_TX_Pin);
+  //   /**USART3 GPIO Configuration
+  //   PD8     ------> USART3_TX
+  //   PD9     ------> USART3_RX
+  //   */
+  //   HAL_GPIO_DeInit(GPIOD, STLK_RX_Pin | STLK_TX_Pin);
 
-  /* USER CODE BEGIN USART3_MspDeInit 1 */
+  //   /* USER CODE BEGIN USART3_MspDeInit 1 */
 
-  /* USER CODE END USART3_MspDeInit 1 */
-  }
-
+  //   /* USER CODE END USART3_MspDeInit 1 */
+  // }
 }
 
 /* USER CODE BEGIN 1 */

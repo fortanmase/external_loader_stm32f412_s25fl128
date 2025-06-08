@@ -30,6 +30,8 @@
   Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_pwr_ex.h \
   Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_uart.h \
   Drivers\STM32F4xx_HAL_Driver\Inc\stm32f4xx_hal_qspi.h \
-  Core\Inc\s25fl128s.h Core\Inc\s25fl128s_conf.h \
+  Core\Inc\s25fl128s.h \
+  C:\legacy\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h \
+  Core\Inc\s25fl128s_conf.h \
   C:\legacy\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdio.h \
   C:\legacy\Keil_v5\ARM\ARMCLANG\Bin\..\include\string.h

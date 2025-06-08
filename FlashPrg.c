@@ -1,9 +1,9 @@
-/**************************************************************************/ /**
-                                                                              * @file     FlashPrg.c
-                                                                              * @brief    Flash Programming Functions adapted for New Device Flash
-                                                                              * @version  V1.0.0
-                                                                              * @date     10. January 2018
-                                                                              ******************************************************************************/
+/**
+ * @file     FlashPrg.c
+ * @brief    Flash Programming Functions adapted for New Device Flash
+ * @version  V1.0.0
+ * @date     10. January 2018
+ ******************************************************************************/
 /*
  * Copyright (c) 2010-2018 Arm Limited. All rights reserved.
  *
@@ -71,10 +71,12 @@ S25FL128S_Interface_t mode = S25FL128S_QPI_MODE;
 
 int Init(unsigned long adr, unsigned long clk, unsigned long fnc)
 {
-  mcu_init();
 
+  mcu_init();
+  // QUADSPI_Init();
+  HAL_Delay(100);
   /* ----- Debug ----- */
-  HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+  // HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
 
   // sprintf((char *)buffer, "\r\n---------- %s ----------\r\n", __func__);
   // HAL_UART_Transmit(&huart3, buffer, strlen((char *)buffer), 100);
@@ -90,10 +92,13 @@ int Init(unsigned long adr, unsigned long clk, unsigned long fnc)
   DevAddr = adr;
 
   uint8_t id = 0U;
-  ret = S25FL128S_ReadID(&hqspi, S25FL128S_SPI_MODE, &id);
+  uint8_t config_reg = 0U;
+  uint8_t regValues[2] = {0, 0};
+  // ret = S25FL128S_ReadID(&hqspi, S25FL128S_SPI_MODE, &id);
   ret |= S25FL128S_ResetEnable(&hqspi, mode);
   ret |= S25FL128S_ResetMemory(&hqspi, mode);
   ret |= S25FL128S_AutoPollingMemReady(&hqspi, mode);
+  ret |= S25FL128S_WriteRegisters(&hqspi, mode, regValues, 2, true);
   ret |= S25FL128S_Enter4BytesAddressMode(&hqspi, mode);
 
   // snprintf((char *)buffer, sizeof(buffer), "Flash ID: 0x%02X | RetVal: 0x%02X\r\n", id, ret);
@@ -288,7 +293,7 @@ int BlankCheck(unsigned long adr, unsigned long sz, unsigned char pat)
   uint8_t id = 0U;
   int flash_ret = 0;
   QUADSPI_Init();
-  flash_ret = S25FL128S_ReadID(&hqspi, S25FL128S_SPI_MODE, &id);
+  // flash_ret = S25FL128S_ReadID(&hqspi, S25FL128S_SPI_MODE, &id);
   flash_ret |= S25FL128S_ResetEnable(&hqspi, mode);
   flash_ret |= S25FL128S_ResetMemory(&hqspi, mode);
   flash_ret |= S25FL128S_AutoPollingMemReady(&hqspi, mode);
@@ -299,7 +304,7 @@ int BlankCheck(unsigned long adr, unsigned long sz, unsigned char pat)
     HAL_Delay(100U);
 
     QUADSPI_Init();
-    flash_ret = S25FL128S_ReadID(&hqspi, S25FL128S_SPI_MODE, &id);
+    // flash_ret = S25FL128S_ReadID(&hqspi, S25FL128S_SPI_MODE, &id);
     flash_ret |= S25FL128S_ResetEnable(&hqspi, mode);
     flash_ret |= S25FL128S_ResetMemory(&hqspi, mode);
     flash_ret |= S25FL128S_AutoPollingMemReady(&hqspi, mode);

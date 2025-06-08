@@ -77,6 +77,18 @@ extern "C"
 #define TCK_GPIO_Port GPIOA
 #define LD2_Pin GPIO_PIN_7
 #define LD2_GPIO_Port GPIOB
+#define FLASH_BK1_IO2_Pin GPIO_PIN_8
+#define FLASH_BK1_IO2_GPIO_Port GPIOC
+#define FLASH_BK1_IO0_Pin GPIO_PIN_9
+#define FLASH_BK1_IO0_GPIO_Port GPIOC
+#define FLASH_BK1_NCS_Pin GPIO_PIN_6
+#define FLASH_BK1_NCS_GPIO_Port GPIOB
+#define FLASH_BK1_IO1_Pin GPIO_PIN_10
+#define FLASH_BK1_IO1_GPIO_Port GPIOC
+#define FLASH_BK1_IO3_Pin GPIO_PIN_1
+#define FLASH_BK1_IO3_GPIO_Port GPIOA
+#define FLASH_CLK_Pin GPIO_PIN_1
+#define FLASH_CLK_GPIO_Port GPIOB
 
   /* USER CODE BEGIN Private defines */
 

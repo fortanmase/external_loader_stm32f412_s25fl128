@@ -1,4 +1,5 @@
 ./objects/s25fl128s.o: Core\Src\s25fl128s.c Core\Inc\s25fl128s.h \
+  C:\legacy\Keil_v5\ARM\ARMCLANG\Bin\..\include\stdbool.h \
   Core\Inc\s25fl128s_conf.h \
   Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f4xx.h \
   Drivers\CMSIS\Device\ST\STM32F4xx\Include\stm32f412zx.h \

@@ -20,36 +20,10 @@
 #ifndef S25FL128S_H
 #define S25FL128S_H
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
 /* Includes ------------------------------------------------------------------*/
+#include <stdbool.h>
+
 #include "s25fl128s_conf.h"
-
-    /** @addtogroup BSP
-     * @{
-     */
-
-    /** @addtogroup Components
-     * @{
-     */
-
-    /** @addtogroup S25FL128S
-     * @brief     This file provides a set of definitions for the Spansion
-     *            S25FL128S memory (configuration, commands, registers).
-     * @{
-     */
-
-    /** @defgroup S25FL128S_Exported_Constants
-     * @{
-     */
-
-    /* S25FL128SAGMFI01 Spansion Memory */
-    /**
-     * @brief  S25FL128S Configuration
-     */
 
 #define S25FL128S_BLOCK_64K (uint32_t)(64 * 1024) /* 256 blocks of 64KBytes  */
 #define S25FL128S_SECTOR_4K (uint32_t)(4 * 1024)  /* 4096 sectors of 4KBytes */
@@ -97,6 +71,7 @@ extern "C"
 #define S25FL128S_READ_DATA_LEARNING_PATTERN_CMD 0x41
 #define S25FL128S_PGM_NV_DATA_LEARNING_REG_CMD 0x43
 #define S25FL128S_WRITE_VOL_DATA_LEARNING_REG_CMD 0x4A
+#define S25FL128S_WRITE_ENABLE_VOLATILE_REG_CMD 0x50
 
 /* Read Operations */
 #define S25FL128S_READ_CMD 0x03
@@ -203,100 +178,67 @@ extern "C"
 /* PPB Lock Register */
 #define S25FL128S_PPBLOCK ((uint8_t)0x01) /*!< PPB array may be programmed or erased */
 
-    /**
-     * @}
-     */
+typedef struct
+{
+    uint32_t FlashSize;          /*!< Size of the flash                         */
+    uint32_t EraseSectorSize;    /*!< Size of sectors for the erase operation   */
+    uint32_t EraseSectorsNumber; /*!< Number of sectors for the erase operation */
+    uint32_t ProgPageSize;       /*!< Size of pages for the program operation   */
+    uint32_t ProgPagesNumber;    /*!< Number of pages for the program operation */
+} S25FL128S_Info_t;
 
-    /** @defgroup S25FL128S_Exported_Types S25FL128S Exported Types
-     * @{
-     */
+typedef enum
+{
+    S25FL128S_SPI_MODE = 0,  /*!< 1-1-1 commands, Power on H/W default setting */
+    S25FL128S_SPI_1I2O_MODE, /*!< 1-1-2 read commands                          */
+    S25FL128S_SPI_2IO_MODE,  /*!< 1-2-2 read commands                          */
+    S25FL128S_SPI_1I4O_MODE, /*!< 1-1-4 read commands                          */
+    S25FL128S_SPI_4IO_MODE,  /*!< 1-4-4 read commands                          */
+    S25FL128S_DPI_MODE,      /*!< 2-2-2 commands                               */
+    S25FL128S_QPI_MODE       /*!< 4-4-4 commands                               */
+} S25FL128S_Interface_t;
 
-    typedef struct
-    {
-        uint32_t FlashSize;          /*!< Size of the flash                         */
-        uint32_t EraseSectorSize;    /*!< Size of sectors for the erase operation   */
-        uint32_t EraseSectorsNumber; /*!< Number of sectors for the erase operation */
-        uint32_t ProgPageSize;       /*!< Size of pages for the program operation   */
-        uint32_t ProgPagesNumber;    /*!< Number of pages for the program operation */
-    } S25FL128S_Info_t;
+typedef enum
+{
+    S25FL128S_STR_TRANSFER = 0, /*!< Single Transfer Rate */
+} S25FL128S_Transfer_t;
 
-    typedef enum
-    {
-        S25FL128S_SPI_MODE = 0,  /*!< 1-1-1 commands, Power on H/W default setting */
-        S25FL128S_SPI_1I2O_MODE, /*!< 1-1-2 read commands                          */
-        S25FL128S_SPI_2IO_MODE,  /*!< 1-2-2 read commands                          */
-        S25FL128S_SPI_1I4O_MODE, /*!< 1-1-4 read commands                          */
-        S25FL128S_SPI_4IO_MODE,  /*!< 1-4-4 read commands                          */
-        S25FL128S_DPI_MODE,      /*!< 2-2-2 commands                               */
-        S25FL128S_QPI_MODE       /*!< 4-4-4 commands                               */
-    } S25FL128S_Interface_t;
+typedef enum
+{
+    S25FL128S_DUALFLASH_DISABLE = 0, /*!< Single flash mode    */
+} S25FL128S_DualFlash_t;
 
-    typedef enum
-    {
-        S25FL128S_STR_TRANSFER = 0, /*!< Single Transfer Rate */
-    } S25FL128S_Transfer_t;
+typedef enum
+{
+    S25FL128S_ERASE_4K = 0, /*!< 4K size Sector erase */
+    S25FL128S_ERASE_64K,    /*!< 64K size Block erase */
+    S25FL128S_ERASE_CHIP    /*!< Whole chip erase     */
+} S25FL128S_Erase_t;
 
-    typedef enum
-    {
-        S25FL128S_DUALFLASH_DISABLE = 0, /*!< Single flash mode    */
-    } S25FL128S_DualFlash_t;
-
-    typedef enum
-    {
-        S25FL128S_ERASE_4K = 0, /*!< 4K size Sector erase */
-        S25FL128S_ERASE_64K,    /*!< 64K size Block erase */
-        S25FL128S_ERASE_CHIP    /*!< Whole chip erase     */
-    } S25FL128S_Erase_t;
-
-    /**
-     * @}
-     */
-
-    /** @defgroup S25FL128S_Exported_Functions
-     * @{
-     */
-
-    int32_t S25FL128S_GetFlashInfo(S25FL128S_Info_t *pInfo);
-    int32_t S25FL128S_AutoPollingMemReady(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
-    int32_t S25FL128S_Enter4BytesAddressMode(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
-    int32_t S25FL128S_DummyCyclesCfg(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
-    /* Register/Setting Commands *************************************************/
-    int32_t S25FL128S_WriteEnable(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
-    int32_t S25FL128S_BlockErase(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint32_t BlockAddress, S25FL128S_Erase_t BlockSize);
-    int32_t S25FL128S_ChipErase(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
-    int32_t S25FL128S_PageProgram(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *pData, uint32_t WriteAddr, uint32_t Size);
-    int32_t S25FL128S_WritePages(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *pData, uint32_t WriteAddr, uint32_t Size);
-    int32_t S25FL128S_Write(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *pData, uint32_t WriteAddr, uint32_t Size);
-    int32_t S25FL128S_ReadSTR(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *pData, uint32_t ReadAddr, uint32_t Size);
-    int32_t S25FL128S_ReadStatusRegister(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *Value);
-    int32_t S25FL128S_EnableMemoryMappedModeSTR(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
-    int32_t S25FL128S_WriteDisable(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
-    int32_t S25FL128S_ReadID(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *ID);
-    int32_t S25FL128S_ResetMemory(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
-    int32_t S25FL128S_ResetEnable(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
-    int32_t S25FL128S_EnterDeepPowerDown(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
-    int32_t S25FL128S_ProgEraseResume(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
-    int32_t S25FL128S_ProgEraseSuspend(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
-    int32_t S25FL128S_ReadSFDP(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *pData, uint32_t ReadAddr, uint32_t Size);
-
-    /**
-     * @}
-     */
-
-    /**
-     * @}
-     */
-
-    /**
-     * @}
-     */
-
-    /**
-     * @}
-     */
-
-#ifdef __cplusplus
-}
-#endif
+int32_t S25FL128S_GetFlashInfo(S25FL128S_Info_t *pInfo);
+int32_t S25FL128S_AutoPollingMemReady(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
+int32_t S25FL128S_Enter4BytesAddressMode(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
+int32_t S25FL128S_DummyCyclesCfg(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
+/* Register/Setting Commands *************************************************/
+int32_t S25FL128S_WriteEnable(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
+int32_t S25FL128S_BlockErase(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint32_t BlockAddress, S25FL128S_Erase_t BlockSize);
+int32_t S25FL128S_ChipErase(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
+int32_t S25FL128S_PageProgram(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *pData, uint32_t WriteAddr, uint32_t Size);
+int32_t S25FL128S_WritePages(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *pData, uint32_t WriteAddr, uint32_t Size);
+int32_t S25FL128S_Write(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *pData, uint32_t WriteAddr, uint32_t Size);
+int32_t S25FL128S_ReadSTR(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *pData, uint32_t ReadAddr, uint32_t Size);
+int32_t S25FL128S_ReadStatusRegister(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *Value);
+int32_t S25FL128S_DummyCyclesCfg(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t mode);
+int32_t S25FL128S_EnableMemoryMappedModeSTR(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
+int32_t S25FL128S_WriteDisable(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
+int32_t S25FL128S_ReadID(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *ID);
+int32_t S25FL128S_ResetMemory(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
+int32_t S25FL128S_ResetEnable(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
+int32_t S25FL128S_EnterDeepPowerDown(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
+int32_t S25FL128S_ProgEraseResume(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
+int32_t S25FL128S_ProgEraseSuspend(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode);
+int32_t S25FL128S_ReadSFDP(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *pData, uint32_t ReadAddr, uint32_t Size);
+int32_t S25FL128S_ReadConfigurationRegister1(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *Value);
+int32_t S25FL128S_WriteRegisters(QSPI_HandleTypeDef *Ctx, S25FL128S_Interface_t Mode, uint8_t *RegValues, uint8_t NumRegs, bool Volatile);
 
 #endif /* S25FL128S_H */
